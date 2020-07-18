@@ -15,10 +15,10 @@
  */
 import reducerUtils from '../../core/common/reducer-utils';
 
-export default function teamReducer(state = {}, action) {
+export default function roleReducer(state = {}, action) {
 	let myState = {};
 	switch(action.type) {
-    	case 'LOAD_INIT_PM_TEAM': {
+    	case 'LOAD_INIT_PM_ROLE': {
     		if (action.responseJson != null && action.responseJson.params != null) {
     			return Object.assign({}, state, {
     				prefTexts: Object.assign({}, state.prefTexts, reducerUtils.getPrefTexts(action)),
@@ -29,17 +29,16 @@ export default function teamReducer(state = {}, action) {
     				items: reducerUtils.getItems(action),
     				listLimit: reducerUtils.getListLimit(action),
     				listStart: reducerUtils.getListStart(action),
-    				orderCriteria: [{'orderColumn':'PM_TEAM_TABLE_NAME','orderDir':'ASC'}],
-    				searchCriteria: [{'searchValue':'','searchColumn':'PM_TEAM_TABLE_NAME'}],
+    				orderCriteria: [{'orderColumn':'PM_ROLE_TABLE_NAME','orderDir':'ASC'}],
+    				searchCriteria: [{'searchValue':'','searchColumn':'PM_ROLE_TABLE_NAME'}],
     				selected: null,
-    				isModifyOpen: false,
-    				isUserRoleOpen: false
+    				isModifyOpen: false
     			});
     		} else {
     			return state;
     		}
     	}
-    	case 'LOAD_LIST_PM_TEAM': {
+    	case 'LOAD_LIST_PM_ROLE': {
     		if (action.responseJson != null && action.responseJson.params != null) {
     			return Object.assign({}, state, {
     				itemCount: reducerUtils.getItemCount(action),
@@ -47,19 +46,18 @@ export default function teamReducer(state = {}, action) {
     				listLimit: reducerUtils.getListLimit(action),
     				listStart: reducerUtils.getListStart(action),
     				selected: null,
-    				isModifyOpen: false,
-    				isUserRoleOpen: false
+    				isModifyOpen: false
     			});
     		} else {
     			return state;
     		}
 		}
-    	case 'PM_TEAM_ITEM': {
+    	case 'PM_ROLE_ITEM': {
 			if (action.responseJson !=  null && action.responseJson.params != null) {
 				// load inputFields
 				let inputFields = {};
 				let prefForms = reducerUtils.getPrefForms(action);
-				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_TEAM_FORM,inputFields,action.appPrefs,"FORM1");
+				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_ROLE_FORM,inputFields,action.appPrefs,"FORM1");
 				
 				// add id if this is existing item
 				if (action.responseJson.params.item != null) {
@@ -76,7 +74,7 @@ export default function teamReducer(state = {}, action) {
 				return state;
 			}
 		}
-		case 'PM_TEAM_INPUT_CHANGE': {
+		case 'PM_ROLE_INPUT_CHANGE': {
 			if (action.params != null) {
 				let inputFields = Object.assign({}, state.inputFields);
 				inputFields[action.params.field] = action.params.value;
@@ -87,7 +85,7 @@ export default function teamReducer(state = {}, action) {
 		        return state;
 		    }
 		}
-		case 'PM_TEAM_ADD_MEMBER': {
+		case 'PM_ROLE_ADD_MEMBER': {
 			if (action.user != null) {
 				return Object.assign({}, state, {
 					parent: action.user
@@ -96,17 +94,17 @@ export default function teamReducer(state = {}, action) {
 		        return state;
 		    }
 		}
-		case 'PM_TEAM_CLEAR_MEMBER': {
+		case 'PM_ROLE_CLEAR_MEMBER': {
 			return Object.assign({}, state, {
 				parent: null
 			});
 		}
-		case 'PM_TEAM_MEMBER_ROLE': {
+		case 'PM_ROLE_MEMBER_ROLE': {
 			if (action.responseJson !=  null && action.responseJson.params != null) {
 				// load inputFields
 				let inputFields = {};
 				let prefForms = reducerUtils.getPrefForms(action);
-				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_TEAM_MEMBER_FORM,inputFields,action.appPrefs,"FORM1");
+				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_ROLE_MEMBER_FORM,inputFields,action.appPrefs,"FORM1");
 				
 				// add id if this is existing item
 				if (action.responseJson.params.item != null) {
@@ -124,13 +122,13 @@ export default function teamReducer(state = {}, action) {
 				return state;
 			}
 		}
-		case 'PM_TEAM_LISTLIMIT': {
+		case 'PM_ROLE_LISTLIMIT': {
 			return reducerUtils.updateListLimit(state,action);
 		}
-		case 'PM_TEAM_SEARCH': { 
+		case 'PM_ROLE_SEARCH': { 
 			return reducerUtils.updateSearch(state,action);
 		}
-		case 'PM_TEAM_ORDERBY': { 
+		case 'PM_ROLE_ORDERBY': { 
 			return reducerUtils.updateOrderBy(state,action);
 		}
     	default:

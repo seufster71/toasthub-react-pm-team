@@ -18,17 +18,17 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as teamActions from './team-actions';
+import * as roleActions from './role-actions';
 import fuLogger from '../../core/common/fu-logger';
-import PMTeamView from '../../memberView/pm_team/team-view';
-import PMTeamModifyView from '../../memberView/pm_team/team-modify-view';
+import PMRoleView from '../../memberView/pm_team/role-view';
+import PMRoleModifyView from '../../memberView/pm_team/role-modify-view';
 import utils from '../../core/common/utils';
 
 
-class PMTeamContainer extends Component {
+class PMRoleContainer extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {pageName:"PM_TEAM",isDeleteModalOpen: false, errors:null, warns:null, successes:null};
+		this.state = {pageName:"PM_ROLE",isDeleteModalOpen: false, errors:null, warns:null, successes:null};
 	}
 
 	componentDidMount() {
@@ -48,16 +48,16 @@ class PMTeamContainer extends Component {
 		}
 
 		let listLimit = parseInt(value);
-		this.props.actions.listLimit({state:this.props.pmteam,listLimit});
+		this.props.actions.listLimit({state:this.props.pmrole,listLimit});
 	}
 
 	onPaginationClick = (value) => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onPaginationClick',msg:"fieldName "+ value});
-		let listStart = this.props.pmteam.listStart;
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onPaginationClick',msg:"fieldName "+ value});
+		let listStart = this.props.pmrole.listStart;
 		let segmentValue = 1;
 		let oldValue = 1;
-		if (this.state["PM_TEAM_PAGINATION"] != null && this.state["PM_TEAM_PAGINATION"] != ""){
-			oldValue = this.state["PM_TEAM_PAGINATION"];
+		if (this.state["PM_ROLE_PAGINATION"] != null && this.state["PM_ROLE_PAGINATION"] != ""){
+			oldValue = this.state["PM_ROLE_PAGINATION"];
 		}
 		if (value === "prev") {
 			segmentValue = oldValue - 1;
@@ -66,10 +66,10 @@ class PMTeamContainer extends Component {
 		} else {
 			segmentValue = value;
 		}
-		listStart = ((segmentValue - 1) * this.props.pmteam.listLimit);
-		this.setState({"PM_TEAM_PAGINATION":segmentValue});
+		listStart = ((segmentValue - 1) * this.props.pmrole.listLimit);
+		this.setState({"PM_ROLE_PAGINATION":segmentValue});
 
-		this.props.actions.list({state:this.props.pmteam,listStart});
+		this.props.actions.list({state:this.props.pmrole,listStart});
 	}
 
 	onSearchChange = (fieldName, event) => {
@@ -88,29 +88,29 @@ class PMTeamContainer extends Component {
 
 	onSearchClick = (fieldName, event) => {
 		let searchCriteria = [];
-		if (fieldName === 'PM_TEAM-SEARCHBY') {
+		if (fieldName === 'PM_ROLE-SEARCHBY') {
 			if (event != null) {
 				for (let o = 0; o < event.length; o++) {
 					let option = {};
-					option.searchValue = this.state['PM_TEAM-SEARCH'];
+					option.searchValue = this.state['PM_ROLE-SEARCH'];
 					option.searchColumn = event[o].value;
 					searchCriteria.push(option);
 				}
 			}
 		} else {
-			for (let i = 0; i < this.props.pmteam.searchCriteria.length; i++) {
+			for (let i = 0; i < this.props.pmrole.searchCriteria.length; i++) {
 				let option = {};
-				option.searchValue = this.state['PM_TEAM-SEARCH'];
-				option.searchColumn = this.props.pmteam.searchCriteria[i].searchColumn;
+				option.searchValue = this.state['PM_ROLE-SEARCH'];
+				option.searchColumn = this.props.pmrole.searchCriteria[i].searchColumn;
 				searchCriteria.push(option);
 			}
 		}
 
-		this.props.actions.search({state:this.props.pmteam,searchCriteria});
+		this.props.actions.search({state:this.props.pmrole,searchCriteria});
 	}
 
 	onOrderBy = (selectedOption, event) => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onOrderBy',msg:"id " + selectedOption});
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onOrderBy',msg:"id " + selectedOption});
 		let orderCriteria = [];
 		if (event != null) {
 			for (let o = 0; o < event.length; o++) {
@@ -127,18 +127,18 @@ class PMTeamContainer extends Component {
 				orderCriteria.push(option);
 			}
 		} else {
-			let option = {orderColumn:"PM_TEAM_TABLE_NAME",orderDir:"ASC"};
+			let option = {orderColumn:"PM_ROLE_TABLE_NAME",orderDir:"ASC"};
 			orderCriteria.push(option);
 		}
-		this.props.actions.orderBy({state:this.props.pmteam,orderCriteria});
+		this.props.actions.orderBy({state:this.props.pmrole,orderCriteria});
 	}
 	
 	onSave = () => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onSave',msg:"test"});
-		let errors = utils.validateFormFields(this.props.pmteam.prefForms.PM_TEAM_FORM, this.props.pmteam.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onSave',msg:"test"});
+		let errors = utils.validateFormFields(this.props.pmrole.prefForms.PM_ROLE_FORM, this.props.pmrole.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
 		
 		if (errors.isValid){
-			this.props.actions.save({state:this.props.pmteam});
+			this.props.actions.save({state:this.props.pmrole});
 		} else {
 			this.setState({errors:errors.errorMap});
 		}
@@ -149,23 +149,23 @@ class PMTeamContainer extends Component {
 		if (item != null && item.id != null) {
 			id = item.id;
 		}
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onModify',msg:"item id "+id});
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onModify',msg:"item id "+id});
 		this.props.actions.modifyItem({id,appPrefs:this.props.appPrefs});
 	}
 	
 	onDelete = (item) => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onDelete',msg:"test"+item.id});
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onDelete',msg:"test"+item.id});
 		this.setState({isDeleteModalOpen:false});
-		this.props.actions.deleteItem({state:this.props.pmteam,id:item.id});
+		this.props.actions.deleteItem({state:this.props.pmrole,id:item.id});
 	}
 	
 	openDeleteModal = (item) => {
 		this.setState({isDeleteModalOpen:true,selected:item});
 	}
 	
-	addMember = (item) => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onModifyPermissions',msg:"test"+item.id});
-		this.props.history.push({pathname:'/pm-member',state:{parent:item}});
+	onModifyPermissions = (item) => {
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onModifyPermissions',msg:"test"+item.id});
+		this.props.history.push({pathname:'/admin-permissions',state:{parent:item}});
 	}
 	
 	closeModal = () => {
@@ -173,21 +173,48 @@ class PMTeamContainer extends Component {
 	}
 	
 	onCancel = () => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onCancel',msg:"test"});
-		this.props.actions.list({state:this.props.pmteam});
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onCancel',msg:"test"});
+		this.props.actions.list({state:this.props.pmrole});
 	}
 	
-	inputChange = (type,field,value,event) => {
-		utils.inputChange({type,props:this.props,field,value,event});
+	inputChange = (fieldName,switchValue,event) => {
+		let value = "";
+		if (switchValue === "DATE") {
+			value = event.toISOString();
+		} else {
+			value = switchValue;
+		}
+		utils.inputChange(this.props,fieldName,value);
+	}
+
+	onUserRoleModify = (item) => {
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onUserRoleModify',msg:"test"+item.id});
+		if (item.userRole != null) {
+			this.props.actions.modifyUserRole({userRoleId:item.userRole.id,roleId:item.id,appPrefs:this.props.appPrefs});
+		} else {
+			this.props.actions.modifyUserRole({roleId:item.id,appPrefs:this.props.appPrefs});
+		}
+	}
+	
+	onUserRoleSave = () => {
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onUserRoleSave',msg:"test"});
+		let errors = utils.validateFormFields(this.props.pmrole.prefForms.ADMIN_USER_ROLE_FORM,this.props.pmrole.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
+		
+		if (errors.isValid){
+			let searchCriteria = {'searchValue':this.state['PM_ROLE_SEARCH_input'],'searchColumn':'PM_ROLE_TABLE_NAME'};
+			this.props.actions.saveRolePermission({state:this.props.pmrole});
+		} else {
+			this.setState({errors:errors.errorMap});
+		}
 	}
 	
 	goBack = () => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::goBack',msg:"test"});
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::goBack',msg:"test"});
 		this.props.history.goBack();
 	}
 	
 	onOption = (code,item) => {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onOption',msg:" code "+code});
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onOption',msg:" code "+code});
 		switch(code) {
 			case 'MODIFY': {
 				this.onModify(item);
@@ -201,34 +228,38 @@ class PMTeamContainer extends Component {
 				this.onDelete(item);
 				break;
 			}
-			case 'MEMBERS': {
-				this.addMember(item);
+			case 'MODIFY_USER_ROLE': {
+				this.onUserRoleModify(item);
+				break;
+			}
+			case 'MODIFY_PERMISSION': {
+				this.onModifyPermissions(item);
 				break;
 			}
 		}
 	}
 	
 	render() {
-		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::render',msg:"Hi there"});
-		if (this.props.pmteam.isModifyOpen) {
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::render',msg:"Hi there"});
+		if (this.props.pmrole.isModifyOpen) {
 			return (
-				<PMTeamModifyView
+				<PMRoleModifyView
 				containerState={this.state}
-				item={this.props.pmteam.selected}
-				inputFields={this.props.pmteam.inputFields}
+				item={this.props.pmrole.selected}
+				inputFields={this.props.pmrole.inputFields}
 				appPrefs={this.props.appPrefs}
-				itemPrefForms={this.props.pmteam.prefForms}
+				itemPrefForms={this.props.pmrole.prefForms}
 				onSave={this.onSave}
 				onCancel={this.onCancel}
 				onReturn={this.onCancel}
 				inputChange={this.inputChange}
-				applicationSelectList={this.props.pmteam.applicationSelectList}/>
+				applicationSelectList={this.props.pmrole.applicationSelectList}/>
 			);
-		} else if (this.props.pmteam.items != null) {
+		} else if (this.props.pmrole.items != null) {
 			return (
-				<PMTeamView 
+				<PMRoleView 
 				containerState={this.state}
-				itemState={this.props.pmteam}
+				itemState={this.props.pmrole}
 				appPrefs={this.props.appPrefs}
 				onListLimitChange={this.onListLimitChange}
 				onSearchChange={this.onSearchChange}
@@ -249,18 +280,18 @@ class PMTeamContainer extends Component {
  	}
 }
 
-PMTeamContainer.propTypes = {
+PMRoleContainer.propTypes = {
 	appPrefs: PropTypes.object,
 	actions: PropTypes.object,
-	pmteam: PropTypes.object
+	pmrole: PropTypes.object
 };
 
 function mapStateToProps(state, ownProps) {
-  return {appPrefs:state.appPrefs, pmteam:state.pmteam, session:state.session};
+  return {appPrefs:state.appPrefs, pmrole:state.pmrole, session:state.session};
 }
 
 function mapDispatchToProps(dispatch) {
-  return { actions:bindActionCreators(teamActions,dispatch) };
+  return { actions:bindActionCreators(roleActions,dispatch) };
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(PMTeamContainer);
+export default connect(mapStateToProps,mapDispatchToProps)(PMRoleContainer);
