@@ -21,18 +21,18 @@ import actionUtils from '../../core/common/action-utils';
 
 
 // thunks
-export function init(user) {
+export function init(parent) {
 	return function(dispatch) {
 		let requestParams = {};
 		requestParams.action = "INIT";
 		requestParams.service = "PM_TEAM_SVC";
 		requestParams.prefTextKeys = new Array("PM_TEAM_PAGE");
 		requestParams.prefLabelKeys = new Array("PM_TEAM_PAGE");
-		if (user != null) {
-			requestParams.userId = user.id;
-			dispatch({type:"PM_TEAM_ADD_USER", user});
+		if (parent != null) {
+			requestParams.parentId = parent.id;
+			dispatch({type:"PM_TEAM_ADD_PARENT", parent});
 		} else {
-			dispatch({type:"PM_TEAM_CLEAR_USER"});
+			dispatch({type:"PM_TEAM_CLEAR_PARENT"});
 		}
 		let params = {};
 		params.requestParams = requestParams;

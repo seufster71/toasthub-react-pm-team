@@ -32,7 +32,8 @@ export default function teamReducer(state = {}, action) {
     				orderCriteria: [{'orderColumn':'PM_PERMISSION_TABLE_NAME','orderDir':'ASC'}],
     				searchCriteria: [{'searchValue':'','searchColumn':'PM_PERMISSION_TABLE_NAME'}],
     				selected: null,
-    				isModifyOpen: false
+    				isModifyOpen: false,
+    				isRolePermissionOpen: false
     			});
     		} else {
     			return state;
@@ -46,7 +47,8 @@ export default function teamReducer(state = {}, action) {
     				listLimit: reducerUtils.getListLimit(action),
     				listStart: reducerUtils.getListStart(action),
     				selected: null,
-    				isModifyOpen: false
+    				isModifyOpen: false,
+    				isRolePermissionOpen: false
     			});
     		} else {
     			return state;
@@ -85,26 +87,26 @@ export default function teamReducer(state = {}, action) {
 		        return state;
 		    }
 		}
-		case 'PM_PERMISSION_ADD_MEMBER': {
-			if (action.user != null) {
+		case 'PM_PERMISSION_ADD_PARENT': {
+			if (action.parent != null) {
 				return Object.assign({}, state, {
-					parent: action.user
+					parent: action.parent
 				});
 			} else {
 		        return state;
 		    }
 		}
-		case 'PM_PERMISSION_CLEAR_MEMBER': {
+		case 'PM_PERMISSION_CLEAR_PARENT': {
 			return Object.assign({}, state, {
 				parent: null
 			});
 		}
-		case 'PM_PERMISSION_MEMBER_ROLE': {
+		case 'PM_PERMISSION_ROLE_PERMISSION': {
 			if (action.responseJson !=  null && action.responseJson.params != null) {
 				// load inputFields
 				let inputFields = {};
 				let prefForms = reducerUtils.getPrefForms(action);
-				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_PERMISSION_MEMBER_FORM,inputFields,action.appPrefs,"FORM1");
+				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_ROLE_PERMISSION_FORM,inputFields,action.appPrefs,"FORM1");
 				
 				// add id if this is existing item
 				if (action.responseJson.params.item != null) {
@@ -114,9 +116,9 @@ export default function teamReducer(state = {}, action) {
 				}
 				return Object.assign({}, state, {
 					prefForms: Object.assign({}, state.prefForms, reducerUtils.getPrefForms(action)),
-					selected : action.responseJson.params.item,
+					selected : action.permission,
 					inputFields : inputFields,
-					isUserRoleOpen: true
+					isRolePermissionOpen: true
 				});
 			} else {
 				return state;

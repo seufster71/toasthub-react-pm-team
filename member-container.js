@@ -194,13 +194,9 @@ class PMMemberContainer extends Component {
 		}
 	}
 
-	onModifyRole = (item) => {
+	addRole = (item) => {
 		fuLogger.log({level:'TRACE',loc:'PMMemberContainer::onAddRole',msg:"test"+item.id});
-		if (item.userRole != null) {
-			this.props.actions.modifyUserRole({userRoleId:item.userRole.id,roleId:item.id,appPrefs:this.props.appPrefs});
-		} else {
-			this.props.actions.modifyUserRole({roleId:item.id,appPrefs:this.props.appPrefs});
-		}
+		this.props.history.push({pathname:'/pm-role',state:{parent:item,team:this.props.pmmember.parent}});
 	}
 	
 	onUserRoleSave = () => {
@@ -235,8 +231,8 @@ class PMMemberContainer extends Component {
 				this.onDelete(item);
 				break;
 			}
-			case 'MODIFY_ROLE': {
-				this.onModifyRole(item);
+			case 'ROLES': {
+				this.addRole(item);
 				break;
 			}
 		}

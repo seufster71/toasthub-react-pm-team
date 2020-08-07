@@ -21,18 +21,21 @@ import actionUtils from '../../core/common/action-utils';
 
 
 // thunks
-export function init(user) {
+export function init(parent,team) {
 	return function(dispatch) {
 		let requestParams = {};
 		requestParams.action = "INIT";
 		requestParams.service = "PM_ROLE_SVC";
 		requestParams.prefTextKeys = new Array("PM_ROLE_PAGE");
 		requestParams.prefLabelKeys = new Array("PM_ROLE_PAGE");
-		if (user != null) {
-			requestParams.userId = user.id;
-			dispatch({type:"PM_ROLE_ADD_USER", user});
+		if (team != null) {
+			requestParams.teamId = team.id;
+		}
+		if (parent != null) {
+			requestParams.parentId = parent.id;
+			dispatch({type:"PM_ROLE_ADD_PARENT", parent, team});
 		} else {
-			dispatch({type:"PM_ROLE_CLEAR_USER"});
+			dispatch({type:"PM_ROLE_CLEAR_PARENT"});
 		}
 		let params = {};
 		params.requestParams = requestParams;
@@ -76,10 +79,13 @@ export function list({state,listStart,listLimit,searchCriteria,orderCriteria,inf
 		} else {
 			requestParams.orderCriteria = state.orderCriteria;
 		}
-		if (state.parent != null) {
-			requestParams.userId = state.parent.id;
+		if (state.team != null) {
+			requestParams.teamId = state.team.id;
 		}
-		let prefChange = {"page":"roles","orderCriteria":requestParams.orderCriteria,"listStart":requestParams.listStart,"listLimit":requestParams.listLimit};
+		if (state.parent != null) {
+			requestParams.parentId = state.parent.id;
+		}
+		let prefChange = {"page":"pm-roles","orderCriteria":requestParams.orderCriteria,"listStart":requestParams.listStart,"listLimit":requestParams.listLimit};
 		dispatch({type:"PM_ROLE_PREF_CHANGE", prefChange});
 		let params = {};
 		params.requestParams = requestParams;
@@ -195,23 +201,23 @@ export function modifyItem({id, appPrefs}) {
 	};
 }
 
-export function modifyUserRole({userRoleId, roleId, appPrefs}) {
+export function modifyMemberRole({role, appPrefs}) {
 	return function(dispatch) {
 	    let requestParams = {};
-	    requestParams.action = "USER_ROLE_ITEM";
-	    requestParams.service = "ROLES_SVC";
-	    requestParams.prefFormKeys = new Array("ADMIN_USER_ROLE_FORM");
-	    if (userRoleId != null) {
-	    	requestParams.itemId = userRoleId;
+	    requestParams.action = "MEMBER_ROLE_ITEM";
+	    requestParams.service = "PM_ROLE_SVC";
+	    requestParams.prefFormKeys = new Array("PM_MEMBER_ROLE_FORM");
+	    if (role != null && role.memberRole != null) {
+	    	requestParams.itemId = role.memberRole.id;
 	    }
-	    requestParams.roleId = roleId;
+	    requestParams.roleId = role.id;
 	    let params = {};
 	    params.requestParams = requestParams;
-	    params.URI = '/api/admin/callService';
+	    params.URI = '/api/member/callService';
 
 	    return callService(params).then( (responseJson) => {
 	    	if (responseJson != null && responseJson.protocalError == null){
-	    		dispatch({ type: 'ROLES_USER_ROLE',responseJson, appPrefs});
+	    		dispatch({ type: 'PM_ROLE_MEMBER_ROLE',responseJson, appPrefs, role});
 	    	} else {
 	    		actionUtils.checkConnectivity(responseJson,dispatch);
 	    	}
@@ -221,14 +227,14 @@ export function modifyUserRole({userRoleId, roleId, appPrefs}) {
 	};
 }
 
-export function saveTeamMember({state}) {
+export function saveMemberRole({state}) {
 	return function(dispatch) {
 		let requestParams = {};
-	    requestParams.action = "ROLE_MEMBER_SAVE";
+	    requestParams.action = "MEMBER_ROLE_SAVE";
 	    requestParams.service = "PM_ROLE_SVC";
 	    requestParams.inputFields = state.inputFields;
-	    requestParams.memberId = state.parent.id;
-	    requestParams.teamId = state.selected.id
+	    requestParams.roleId = state.selected.id;
+	    requestParams.memberId = state.parent.id
 
 	    let params = {};
 	    params.requestParams = requestParams;

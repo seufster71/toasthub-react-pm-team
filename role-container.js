@@ -22,6 +22,7 @@ import * as roleActions from './role-actions';
 import fuLogger from '../../core/common/fu-logger';
 import PMRoleView from '../../memberView/pm_team/role-view';
 import PMRoleModifyView from '../../memberView/pm_team/role-modify-view';
+import PMMemberRolesModifyView from '../../memberView/pm_team/member-roles-modify-view';
 import utils from '../../core/common/utils';
 
 
@@ -33,7 +34,7 @@ class PMRoleContainer extends Component {
 
 	componentDidMount() {
 		if (this.props.history.location.state != null && this.props.history.location.state.parent != null) {
-			this.props.actions.init(this.props.history.location.state.parent);
+			this.props.actions.init(this.props.history.location.state.parent,this.props.history.location.state.team);
 		} else {
 			this.props.actions.init();
 		}
@@ -163,9 +164,9 @@ class PMRoleContainer extends Component {
 		this.setState({isDeleteModalOpen:true,selected:item});
 	}
 	
-	onModifyPermissions = (item) => {
+	addPermissions = (item) => {
 		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onModifyPermissions',msg:"test"+item.id});
-		this.props.history.push({pathname:'/admin-permissions',state:{parent:item}});
+		this.props.history.push({pathname:'/pm-permission',state:{parent:item}});
 	}
 	
 	closeModal = () => {
@@ -177,32 +178,26 @@ class PMRoleContainer extends Component {
 		this.props.actions.list({state:this.props.pmrole});
 	}
 	
-	inputChange = (fieldName,switchValue,event) => {
-		let value = "";
-		if (switchValue === "DATE") {
-			value = event.toISOString();
-		} else {
-			value = switchValue;
-		}
-		utils.inputChange(this.props,fieldName,value);
+	inputChange = (type,field,value,event) => {
+		utils.inputChange({type,props:this.props,field,value,event});
 	}
 
-	onUserRoleModify = (item) => {
-		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onUserRoleModify',msg:"test"+item.id});
-		if (item.userRole != null) {
-			this.props.actions.modifyUserRole({userRoleId:item.userRole.id,roleId:item.id,appPrefs:this.props.appPrefs});
+	onMemberRoleModify = (item) => {
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onMemberRoleModify',msg:"test"+item.id});
+		if (item.memberRole != null) {
+			this.props.actions.modifyMemberRole({role:item,appPrefs:this.props.appPrefs});
 		} else {
-			this.props.actions.modifyUserRole({roleId:item.id,appPrefs:this.props.appPrefs});
+			this.props.actions.modifyMemberRole({role:item,appPrefs:this.props.appPrefs});
 		}
 	}
 	
-	onUserRoleSave = () => {
-		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onUserRoleSave',msg:"test"});
-		let errors = utils.validateFormFields(this.props.pmrole.prefForms.ADMIN_USER_ROLE_FORM,this.props.pmrole.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
+	onMemberRoleSave = () => {
+		fuLogger.log({level:'TRACE',loc:'PMRoleContainer::onMemberRoleSave',msg:"test"});
+		let errors = utils.validateFormFields(this.props.pmrole.prefForms.PM_MEMBER_ROLE_FORM,this.props.pmrole.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
 		
 		if (errors.isValid){
 			let searchCriteria = {'searchValue':this.state['PM_ROLE_SEARCH_input'],'searchColumn':'PM_ROLE_TABLE_NAME'};
-			this.props.actions.saveRolePermission({state:this.props.pmrole});
+			this.props.actions.saveMemberRole({state:this.props.pmrole});
 		} else {
 			this.setState({errors:errors.errorMap});
 		}
@@ -228,12 +223,12 @@ class PMRoleContainer extends Component {
 				this.onDelete(item);
 				break;
 			}
-			case 'MODIFY_USER_ROLE': {
-				this.onUserRoleModify(item);
+			case 'MODIFY_MEMBER_ROLE': {
+				this.onMemberRoleModify(item);
 				break;
 			}
-			case 'MODIFY_PERMISSION': {
-				this.onModifyPermissions(item);
+			case 'PERMISSIONS': {
+				this.addPermissions(item);
 				break;
 			}
 		}
@@ -245,15 +240,24 @@ class PMRoleContainer extends Component {
 			return (
 				<PMRoleModifyView
 				containerState={this.state}
-				item={this.props.pmrole.selected}
-				inputFields={this.props.pmrole.inputFields}
+				itemState={this.props.pmrole}
 				appPrefs={this.props.appPrefs}
-				itemPrefForms={this.props.pmrole.prefForms}
 				onSave={this.onSave}
 				onCancel={this.onCancel}
 				onReturn={this.onCancel}
 				inputChange={this.inputChange}
 				applicationSelectList={this.props.pmrole.applicationSelectList}/>
+			);
+		} else if (this.props.pmrole.isMemberRoleOpen) {
+			return (
+				<PMMemberRolesModifyView
+				containerState={this.state}
+				itemState={this.props.pmrole}
+				appPrefs={this.props.appPrefs}
+				onSave={this.onMemberRoleSave}
+				onCancel={this.onCancel}
+				onReturn={this.onCancel}
+				inputChange={this.inputChange}/>
 			);
 		} else if (this.props.pmrole.items != null) {
 			return (

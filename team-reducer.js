@@ -87,16 +87,16 @@ export default function teamReducer(state = {}, action) {
 		        return state;
 		    }
 		}
-		case 'PM_TEAM_ADD_MEMBER': {
-			if (action.user != null) {
+		case 'PM_TEAM_ADD_PARENT': {
+			if (action.parent != null) {
 				return Object.assign({}, state, {
-					parent: action.user
+					parent: action.parent
 				});
 			} else {
 		        return state;
 		    }
 		}
-		case 'PM_TEAM_CLEAR_MEMBER': {
+		case 'PM_TEAM_CLEAR_PARENT': {
 			return Object.assign({}, state, {
 				parent: null
 			});

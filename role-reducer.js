@@ -32,7 +32,8 @@ export default function roleReducer(state = {}, action) {
     				orderCriteria: [{'orderColumn':'PM_ROLE_TABLE_NAME','orderDir':'ASC'}],
     				searchCriteria: [{'searchValue':'','searchColumn':'PM_ROLE_TABLE_NAME'}],
     				selected: null,
-    				isModifyOpen: false
+    				isModifyOpen: false,
+    				isMemberRoleOpen: false
     			});
     		} else {
     			return state;
@@ -46,7 +47,8 @@ export default function roleReducer(state = {}, action) {
     				listLimit: reducerUtils.getListLimit(action),
     				listStart: reducerUtils.getListStart(action),
     				selected: null,
-    				isModifyOpen: false
+    				isModifyOpen: false,
+    				isMemberRoleOpen: false
     			});
     		} else {
     			return state;
@@ -85,18 +87,20 @@ export default function roleReducer(state = {}, action) {
 		        return state;
 		    }
 		}
-		case 'PM_ROLE_ADD_MEMBER': {
-			if (action.user != null) {
+		case 'PM_ROLE_ADD_PARENT': {
+			if (action.parent != null) {
 				return Object.assign({}, state, {
-					parent: action.user
+					parent: action.parent,
+					team: action.team
 				});
 			} else {
 		        return state;
 		    }
 		}
-		case 'PM_ROLE_CLEAR_MEMBER': {
+		case 'PM_ROLE_CLEAR_PARENT': {
 			return Object.assign({}, state, {
-				parent: null
+				parent: null,
+				team: null
 			});
 		}
 		case 'PM_ROLE_MEMBER_ROLE': {
@@ -104,19 +108,17 @@ export default function roleReducer(state = {}, action) {
 				// load inputFields
 				let inputFields = {};
 				let prefForms = reducerUtils.getPrefForms(action);
-				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_ROLE_MEMBER_FORM,inputFields,action.appPrefs,"FORM1");
+				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_MEMBER_ROLE_FORM,inputFields,action.appPrefs,"FORM1");
 				
 				// add id if this is existing item
 				if (action.responseJson.params.item != null) {
 					inputFields.itemId = action.responseJson.params.item.id;
-				} else {
-					action.responseJson.params.item = {roleId:action.responseJson.params.roleId};
 				}
 				return Object.assign({}, state, {
 					prefForms: Object.assign({}, state.prefForms, reducerUtils.getPrefForms(action)),
-					selected : action.responseJson.params.item,
+					selected : action.role,
 					inputFields : inputFields,
-					isUserRoleOpen: true
+					isMemberRoleOpen: true
 				});
 			} else {
 				return state;

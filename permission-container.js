@@ -22,6 +22,7 @@ import * as permissionActions from './permission-actions';
 import fuLogger from '../../core/common/fu-logger';
 import PMPermissionView from '../../memberView/pm_team/permission-view';
 import PMPermissionModifyView from '../../memberView/pm_team/permission-modify-view';
+import PMRolePermissionModifyView from '../../memberView/pm_team/role-permission-modify-view';
 import utils from '../../core/common/utils';
 
 
@@ -163,11 +164,6 @@ class PMPermissionContainer extends Component {
 		this.setState({isDeleteModalOpen:true,selected:item});
 	}
 	
-	onModifyPermissions = (item) => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onModifyPermissions',msg:"test"+item.id});
-		this.props.history.push({pathname:'/admin-permissions',state:{parent:item}});
-	}
-	
 	closeModal = () => {
 		this.setState({isDeleteModalOpen:false,errors:null,warns:null});
 	}
@@ -177,28 +173,22 @@ class PMPermissionContainer extends Component {
 		this.props.actions.list({state:this.props.pmpermission});
 	}
 	
-	inputChange = (fieldName,switchValue,event) => {
-		let value = "";
-		if (switchValue === "DATE") {
-			value = event.toISOString();
-		} else {
-			value = switchValue;
-		}
-		utils.inputChange(this.props,fieldName,value);
+	inputChange = (type,field,value,event) => {
+		utils.inputChange({type,props:this.props,field,value,event});
 	}
 
-	onUserRoleModify = (item) => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onUserRoleModify',msg:"test"+item.id});
-		if (item.userRole != null) {
-			this.props.actions.modifyUserRole({userRoleId:item.userRole.id,roleId:item.id,appPrefs:this.props.appPrefs});
+	onRolePermissionModify = (item) => {
+		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onRolePermissionModify',msg:"test"+item.id});
+		if (item.rolePermission != null) {
+			this.props.actions.modifyRolePermission({permission:item,appPrefs:this.props.appPrefs});
 		} else {
-			this.props.actions.modifyUserRole({roleId:item.id,appPrefs:this.props.appPrefs});
+			this.props.actions.modifyRolePermission({permission:item,appPrefs:this.props.appPrefs});
 		}
 	}
 	
-	onUserRoleSave = () => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onUserRoleSave',msg:"test"});
-		let errors = utils.validateFormFields(this.props.pmpermission.prefForms.ADMIN_USER_ROLE_FORM,this.props.pmpermission.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
+	onRolePermissionSave = () => {
+		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onRolePermissionSave',msg:"test"});
+		let errors = utils.validateFormFields(this.props.pmpermission.prefForms.PM_ROLE_PERMISSION_FORM,this.props.pmpermission.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
 		
 		if (errors.isValid){
 			let searchCriteria = {'searchValue':this.state['PM_PERMISSION_SEARCH_input'],'searchColumn':'PM_PERMISSION_TABLE_NAME'};
@@ -228,12 +218,8 @@ class PMPermissionContainer extends Component {
 				this.onDelete(item);
 				break;
 			}
-			case 'MODIFY_USER_ROLE': {
-				this.onUserRoleModify(item);
-				break;
-			}
-			case 'MODIFY_PERMISSION': {
-				this.onModifyPermissions(item);
+			case 'MODIFY_ROLE_PERMISSION': {
+				this.onRolePermissionModify(item);
 				break;
 			}
 		}
@@ -254,6 +240,17 @@ class PMPermissionContainer extends Component {
 				onReturn={this.onCancel}
 				inputChange={this.inputChange}
 				applicationSelectList={this.props.pmpermission.applicationSelectList}/>
+			);
+		} else if (this.props.pmpermission.isRolePermissionOpen) {
+			return (
+				<PMRolePermissionModifyView
+				containerState={this.state}
+				itemState={this.props.pmpermission}
+				appPrefs={this.props.appPrefs}
+				onSave={this.onRolePermissionSave}
+				onCancel={this.onCancel}
+				onReturn={this.onCancel}
+				inputChange={this.inputChange}/>
 			);
 		} else if (this.props.pmpermission.items != null) {
 			return (
@@ -291,7 +288,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return { actions:bindActionCreators(teamActions,dispatch) };
+  return { actions:bindActionCreators(permissionActions,dispatch) };
 }
 
 export default connect(mapStateToProps,mapDispatchToProps)(PMPermissionContainer);
