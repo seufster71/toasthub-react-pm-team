@@ -33,7 +33,7 @@ export default function teamReducer(state = {}, action) {
     				searchCriteria: [{'searchValue':'','searchColumn':'PM_TEAM_TABLE_NAME'}],
     				selected: null,
     				isModifyOpen: false,
-    				isUserRoleOpen: false
+    				isTeamLinkOpen: false
     			});
     		} else {
     			return state;
@@ -48,7 +48,7 @@ export default function teamReducer(state = {}, action) {
     				listStart: reducerUtils.getListStart(action),
     				selected: null,
     				isModifyOpen: false,
-    				isUserRoleOpen: false
+    				isTeamLinkOpen: false
     			});
     		} else {
     			return state;
@@ -90,7 +90,8 @@ export default function teamReducer(state = {}, action) {
 		case 'PM_TEAM_ADD_PARENT': {
 			if (action.parent != null) {
 				return Object.assign({}, state, {
-					parent: action.parent
+					parent: action.parent,
+					parentType: action.parentType
 				});
 			} else {
 		        return state;
@@ -98,27 +99,26 @@ export default function teamReducer(state = {}, action) {
 		}
 		case 'PM_TEAM_CLEAR_PARENT': {
 			return Object.assign({}, state, {
-				parent: null
+				parent: null,
+				parentType: null
 			});
 		}
-		case 'PM_TEAM_MEMBER_ROLE': {
+		case 'PM_TEAM_LINK': {
 			if (action.responseJson !=  null && action.responseJson.params != null) {
 				// load inputFields
 				let inputFields = {};
 				let prefForms = reducerUtils.getPrefForms(action);
-				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_TEAM_MEMBER_FORM,inputFields,action.appPrefs,"FORM1");
+				inputFields = reducerUtils.loadInputFields(action.responseJson.params.item,prefForms.PM_TEAM_PRODUCT_FORM,inputFields,action.appPrefs,"FORM1");
 				
 				// add id if this is existing item
 				if (action.responseJson.params.item != null) {
 					inputFields.itemId = action.responseJson.params.item.id;
-				} else {
-					action.responseJson.params.item = {roleId:action.responseJson.params.roleId};
 				}
 				return Object.assign({}, state, {
 					prefForms: Object.assign({}, state.prefForms, reducerUtils.getPrefForms(action)),
 					selected : action.responseJson.params.item,
 					inputFields : inputFields,
-					isUserRoleOpen: true
+					isTeamLinkOpen: true
 				});
 			} else {
 				return state;

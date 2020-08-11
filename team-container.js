@@ -22,6 +22,7 @@ import * as teamActions from './team-actions';
 import fuLogger from '../../core/common/fu-logger';
 import PMTeamView from '../../memberView/pm_team/team-view';
 import PMTeamModifyView from '../../memberView/pm_team/team-modify-view';
+import PMTeamLinkModifyView from '../../memberView/pm_team/team-link-modify-view';
 import utils from '../../core/common/utils';
 
 
@@ -33,7 +34,7 @@ class PMTeamContainer extends Component {
 
 	componentDidMount() {
 		if (this.props.history.location.state != null && this.props.history.location.state.parent != null) {
-			this.props.actions.init(this.props.history.location.state.parent);
+			this.props.actions.init(this.props.history.location.state.parent,this.props.history.location.state.parentType);
 		} else {
 			this.props.actions.init();
 		}
@@ -168,6 +169,27 @@ class PMTeamContainer extends Component {
 		this.props.history.push({pathname:'/pm-member',state:{parent:item}});
 	}
 	
+	onTeamLinkModify = (item) => {
+		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onTeamLinkModify',msg:"test"+item.id});
+		if (item.productTeam != null) {
+			this.props.actions.modifyTeamLink({item,parentType:this.props.pmteam.parentType,appPrefs:this.props.appPrefs});
+		} else {
+			this.props.actions.modifyTeamLink({item,parentType:this.props.pmteam.parentType,appPrefs:this.props.appPrefs});
+		}
+	}
+	
+	onTeamLinkSave = () => {
+		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onTeamLinkSave',msg:"test"});
+		let errors = utils.validateFormFields(this.props.pmteam.prefForms.PM_TEAM_PRODUCT_FORM,this.props.pmrole.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
+		
+		if (errors.isValid){
+			let searchCriteria = {'searchValue':this.state['PM_TEAM_SEARCH_input'],'searchColumn':'PM_TEAM_TABLE_NAME'};
+			this.props.actions.saveTeamLink({state:this.props.pmteam});
+		} else {
+			this.setState({errors:errors.errorMap});
+		}
+	}
+	
 	closeModal = () => {
 		this.setState({isDeleteModalOpen:false,errors:null,warns:null});
 	}
@@ -205,6 +227,10 @@ class PMTeamContainer extends Component {
 				this.addMember(item);
 				break;
 			}
+			case 'MODIFY_LINK': {
+				this.onTeamLinkModify(item);
+				break;
+			}
 		}
 	}
 	
@@ -221,8 +247,18 @@ class PMTeamContainer extends Component {
 				onSave={this.onSave}
 				onCancel={this.onCancel}
 				onReturn={this.onCancel}
-				inputChange={this.inputChange}
-				applicationSelectList={this.props.pmteam.applicationSelectList}/>
+				inputChange={this.inputChange}/>
+			);
+		} else if (this.props.pmteam.isTeamLinkOpen) {
+			return (
+				<PMTeamLinkModifyView
+				containerState={this.state}
+				itemState={this.props.pmteam}
+				appPrefs={this.props.appPrefs}
+				onSave={this.onLinkTeamSave}
+				onCancel={this.onCancel}
+				onReturn={this.onCancel}
+				inputChange={this.inputChange}/>
 			);
 		} else if (this.props.pmteam.items != null) {
 			return (
