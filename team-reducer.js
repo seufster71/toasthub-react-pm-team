@@ -116,7 +116,7 @@ export default function teamReducer(state = {}, action) {
 				}
 				return Object.assign({}, state, {
 					prefForms: Object.assign({}, state.prefForms, reducerUtils.getPrefForms(action)),
-					selected : action.responseJson.params.item,
+					selected : action.item,
 					inputFields : inputFields,
 					isTeamLinkOpen: true
 				});

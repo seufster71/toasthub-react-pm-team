@@ -201,14 +201,14 @@ export function modifyItem({id, appPrefs}) {
 	};
 }
 
-export function saveTeamMember({state}) {
+export function saveTeamLink({state}) {
 	return function(dispatch) {
 		let requestParams = {};
-	    requestParams.action = "TEAM_MEMBER_SAVE";
+	    requestParams.action = "LINK_PARENT_SAVE";
 	    requestParams.service = "PM_TEAM_SVC";
 	    requestParams.inputFields = state.inputFields;
-	    requestParams.memberId = state.parent.id;
-	    requestParams.teamId = state.selected.id
+	    requestParams.parentId = state.parent.id;
+	    requestParams.itemId = state.selected.id
 
 	    let params = {};
 	    params.requestParams = requestParams;
@@ -233,7 +233,7 @@ export function saveTeamMember({state}) {
 export function modifyTeamLink({item, parentType, appPrefs}) {
 	return function(dispatch) {
 	    let requestParams = {};
-	    requestParams.action = "LINK_PARENT";
+	    requestParams.action = "LINK_PARENT_MODIFY";
 	    requestParams.service = "PM_TEAM_SVC";
 	    requestParams.prefFormKeys = new Array("PM_TEAM_PRODUCT_FORM");
 	    if (item != null && parentType != null) {

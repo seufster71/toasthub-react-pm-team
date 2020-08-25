@@ -180,7 +180,7 @@ class PMTeamContainer extends Component {
 	
 	onTeamLinkSave = () => {
 		fuLogger.log({level:'TRACE',loc:'PMTeamContainer::onTeamLinkSave',msg:"test"});
-		let errors = utils.validateFormFields(this.props.pmteam.prefForms.PM_TEAM_PRODUCT_FORM,this.props.pmrole.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
+		let errors = utils.validateFormFields(this.props.pmteam.prefForms.PM_TEAM_PRODUCT_FORM,this.props.pmteam.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
 		
 		if (errors.isValid){
 			let searchCriteria = {'searchValue':this.state['PM_TEAM_SEARCH_input'],'searchColumn':'PM_TEAM_TABLE_NAME'};
@@ -255,7 +255,7 @@ class PMTeamContainer extends Component {
 				containerState={this.state}
 				itemState={this.props.pmteam}
 				appPrefs={this.props.appPrefs}
-				onSave={this.onLinkTeamSave}
+				onSave={this.onTeamLinkSave}
 				onCancel={this.onCancel}
 				onReturn={this.onCancel}
 				inputChange={this.inputChange}/>
