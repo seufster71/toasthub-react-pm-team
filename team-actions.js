@@ -208,7 +208,8 @@ export function saveTeamLink({state}) {
 	    requestParams.service = "PM_TEAM_SVC";
 	    requestParams.inputFields = state.inputFields;
 	    requestParams.parentId = state.parent.id;
-	    requestParams.itemId = state.selected.id
+	    requestParams.itemId = state.selected.id;
+	    requestParams.parentType = state.parentType;
 
 	    let params = {};
 	    params.requestParams = requestParams;
