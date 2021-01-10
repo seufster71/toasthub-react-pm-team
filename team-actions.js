@@ -52,7 +52,7 @@ export function init(parent,parentType) {
 	};
 }
 
-export function list({state,listStart,listLimit,searchCriteria,orderCriteria,info}) {
+export function list({state,listStart,listLimit,searchCriteria,orderCriteria,info,paginationSegment}) {
 	return function(dispatch) {
 		let requestParams = {};
 		requestParams.action = "LIST";
@@ -81,7 +81,7 @@ export function list({state,listStart,listLimit,searchCriteria,orderCriteria,inf
 			requestParams.parentId = state.parent.id;
 			requestParams.parentType = state.parentType;
 		}
-		let prefChange = {"page":"roles","orderCriteria":requestParams.orderCriteria,"listStart":requestParams.listStart,"listLimit":requestParams.listLimit};
+		let prefChange = {"page":"pm-team","orderCriteria":requestParams.orderCriteria,"listStart":requestParams.listStart,"listLimit":requestParams.listLimit};
 		dispatch({type:"PM_TEAM_PREF_CHANGE", prefChange});
 		let params = {};
 		params.requestParams = requestParams;
@@ -89,7 +89,7 @@ export function list({state,listStart,listLimit,searchCriteria,orderCriteria,inf
 
 		return callService(params).then( (responseJson) => {
 			if (responseJson != null && responseJson.protocalError == null){
-				dispatch({ type: "LOAD_LIST_PM_TEAM", responseJson });
+				dispatch({ type: "LOAD_LIST_PM_TEAM", responseJson, paginationSegment });
 				if (info != null) {
 		        	  dispatch({type:'SHOW_STATUS',info:info});  
 		        }
@@ -117,7 +117,7 @@ export function search({state,searchCriteria}) {
 	 };
 }
 
-export function save({state}) {
+export function saveItem({state}) {
 	return function(dispatch) {
 		let requestParams = {};
 	    requestParams.action = "SAVE";
@@ -282,4 +282,22 @@ export function clearRole() {
 	return function(dispatch) {
 		dispatch({ type:"PM_TEAM_CLEAR_ROLE"});
 	};
+}
+
+export function setErrors({errors}) {
+	 return function(dispatch) {
+		 dispatch({ type:"PM_TEAM_SET_ERRORS",errors});
+	 };
+}
+
+export function openDeleteModal({item}) {
+	 return function(dispatch) {
+		 dispatch({type:"PM_TEAM_OPEN_DELETE_MODAL",item});
+	 };
+}
+
+export function closeDeleteModal() {
+	 return function(dispatch) {
+		 dispatch({type:"PM_TEAM_CLOSE_DELETE_MODAL"});
+	 };
 }

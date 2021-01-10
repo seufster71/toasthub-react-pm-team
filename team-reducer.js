@@ -16,7 +16,6 @@
 import reducerUtils from '../../core/common/reducer-utils';
 
 export default function teamReducer(state = {}, action) {
-	let myState = {};
 	switch(action.type) {
     	case 'LOAD_INIT_PM_TEAM': {
     		if (action.responseJson != null && action.responseJson.params != null) {
@@ -31,9 +30,16 @@ export default function teamReducer(state = {}, action) {
     				listStart: reducerUtils.getListStart(action),
     				orderCriteria: [{'orderColumn':'PM_TEAM_TABLE_NAME','orderDir':'ASC'}],
     				searchCriteria: [{'searchValue':'','searchColumn':'PM_TEAM_TABLE_NAME'}],
+    				paginationSegment: 1,
     				selected: null,
     				isModifyOpen: false,
-    				isTeamLinkOpen: false
+    				isTeamLinkOpen: false,
+    				pageName:"TEAM",
+					isDeleteModalOpen: false,
+					errors:null, 
+					warns:null, 
+					successes:null,
+					searchValue:""
     			});
     		} else {
     			return state;
@@ -46,9 +52,14 @@ export default function teamReducer(state = {}, action) {
     				items: reducerUtils.getItems(action),
     				listLimit: reducerUtils.getListLimit(action),
     				listStart: reducerUtils.getListStart(action),
+    				paginationSegment: action.paginationSegment,
     				selected: null,
     				isModifyOpen: false,
-    				isTeamLinkOpen: false
+    				isTeamLinkOpen: false,
+    				isDeleteModalOpen: false,
+					errors:null, 
+					warns:null, 
+					successes:null
     			});
     		} else {
     			return state;
@@ -132,6 +143,22 @@ export default function teamReducer(state = {}, action) {
 		}
 		case 'PM_TEAM_ORDERBY': { 
 			return reducerUtils.updateOrderBy(state,action);
+		}
+		case 'PM_TEAM_SET_ERRORS': {
+			return Object.assign({}, state, {
+				errors: action.errors
+			});
+		}
+		case 'PM_TEAM_CLOSE_DELETE_MODAL': {
+			return Object.assign({}, state, {
+				isDeleteModalOpen: false
+			});
+		}
+		case 'PM_TEAM_OPEN_DELETE_MODAL': {
+			return Object.assign({}, state, {
+				isDeleteModalOpen: true,
+				selected: action.item
+			});
 		}
     	default:
     		return state;

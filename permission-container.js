@@ -24,12 +24,12 @@ import PMPermissionView from '../../memberView/pm_team/permission-view';
 import PMPermissionModifyView from '../../memberView/pm_team/permission-modify-view';
 import PMRolePermissionModifyView from '../../memberView/pm_team/role-permission-modify-view';
 import utils from '../../core/common/utils';
+import BaseContainer from '../../core/container/base-container';
 
 
-class PMPermissionContainer extends Component {
+class PMPermissionContainer extends BaseContainer {
 	constructor(props) {
 		super(props);
-		this.state = {pageName:"PM_PERMISSION",isDeleteModalOpen: false, errors:null, warns:null, successes:null};
 	}
 
 	componentDidMount() {
@@ -39,142 +39,13 @@ class PMPermissionContainer extends Component {
 			this.props.actions.init();
 		}
 	}
-
-	onListLimitChange = (fieldName, event) => {
-		let value = 20;
-		if (this.props.codeType === 'NATIVE') {
-			value = event.nativeEvent.text;
-		} else {
-			value = event.target.value;
-		}
-
-		let listLimit = parseInt(value);
-		this.props.actions.listLimit({state:this.props.pmpermission,listLimit});
-	}
-
-	onPaginationClick = (value) => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onPaginationClick',msg:"fieldName "+ value});
-		let listStart = this.props.pmpermission.listStart;
-		let segmentValue = 1;
-		let oldValue = 1;
-		if (this.state["PM_PERMISSION_PAGINATION"] != null && this.state["PM_PERMISSION_PAGINATION"] != ""){
-			oldValue = this.state["PM_PERMISSION_PAGINATION"];
-		}
-		if (value === "prev") {
-			segmentValue = oldValue - 1;
-		} else if (value === "next") {
-			segmentValue = oldValue + 1;
-		} else {
-			segmentValue = value;
-		}
-		listStart = ((segmentValue - 1) * this.props.pmpermission.listLimit);
-		this.setState({"PM_PERMISSION_PAGINATION":segmentValue});
-
-		this.props.actions.list({state:this.props.pmpermission,listStart});
-	}
-
-	onSearchChange = (fieldName, event) => {
-		if (event.type === 'keypress') {
-			if (event.key === 'Enter') {
-				this.onSearchClick(fieldName,event);
-			}
-		} else {
-			if (this.props.codeType === 'NATIVE') {
-				this.setState({[fieldName]:event.nativeEvent.text});
-			} else {
-				this.setState({[fieldName]:event.target.value});
-			}
-		}
-	}
-
-	onSearchClick = (fieldName, event) => {
-		let searchCriteria = [];
-		if (fieldName === 'PM_PERMISSION-SEARCHBY') {
-			if (event != null) {
-				for (let o = 0; o < event.length; o++) {
-					let option = {};
-					option.searchValue = this.state['PM_PERMISSION-SEARCH'];
-					option.searchColumn = event[o].value;
-					searchCriteria.push(option);
-				}
-			}
-		} else {
-			for (let i = 0; i < this.props.pmpermission.searchCriteria.length; i++) {
-				let option = {};
-				option.searchValue = this.state['PM_PERMISSION-SEARCH'];
-				option.searchColumn = this.props.pmpermission.searchCriteria[i].searchColumn;
-				searchCriteria.push(option);
-			}
-		}
-
-		this.props.actions.search({state:this.props.pmpermission,searchCriteria});
-	}
-
-	onOrderBy = (selectedOption, event) => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onOrderBy',msg:"id " + selectedOption});
-		let orderCriteria = [];
-		if (event != null) {
-			for (let o = 0; o < event.length; o++) {
-				let option = {};
-				if (event[o].label.includes("ASC")) {
-					option.orderColumn = event[o].value;
-					option.orderDir = "ASC";
-				} else if (event[o].label.includes("DESC")){
-					option.orderColumn = event[o].value;
-					option.orderDir = "DESC";
-				} else {
-					option.orderColumn = event[o].value;
-				}
-				orderCriteria.push(option);
-			}
-		} else {
-			let option = {orderColumn:"PM_PERMISSION_TABLE_NAME",orderDir:"ASC"};
-			orderCriteria.push(option);
-		}
-		this.props.actions.orderBy({state:this.props.pmpermission,orderCriteria});
+	
+	getState = () => {
+		return this.props.pmpermission;
 	}
 	
-	onSave = () => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onSave',msg:"test"});
-		let errors = utils.validateFormFields(this.props.pmpermission.prefForms.PM_PERMISSION_FORM, this.props.pmpermission.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
-		
-		if (errors.isValid){
-			this.props.actions.save({state:this.props.pmpermission});
-		} else {
-			this.setState({errors:errors.errorMap});
-		}
-	}
-	
-	onModify = (item) => {
-		let id = null;
-		if (item != null && item.id != null) {
-			id = item.id;
-		}
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onModify',msg:"item id "+id});
-		this.props.actions.modifyItem({id,appPrefs:this.props.appPrefs});
-	}
-	
-	onDelete = (item) => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onDelete',msg:"test"+item.id});
-		this.setState({isDeleteModalOpen:false});
-		this.props.actions.deleteItem({state:this.props.pmpermission,id:item.id});
-	}
-	
-	openDeleteModal = (item) => {
-		this.setState({isDeleteModalOpen:true,selected:item});
-	}
-	
-	closeModal = () => {
-		this.setState({isDeleteModalOpen:false,errors:null,warns:null});
-	}
-	
-	onCancel = () => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onCancel',msg:"test"});
-		this.props.actions.list({state:this.props.pmpermission});
-	}
-	
-	inputChange = (type,field,value,event) => {
-		utils.inputChange({type,props:this.props,field,value,event});
+	getForm = () => {
+		return "PM_PERMISSION_FORM";
 	}
 
 	onRolePermissionModify = (item) => {
@@ -191,33 +62,19 @@ class PMPermissionContainer extends Component {
 		let errors = utils.validateFormFields(this.props.pmpermission.prefForms.PM_ROLE_PERMISSION_FORM,this.props.pmpermission.inputFields, this.props.appPrefs.prefGlobal.LANGUAGES);
 		
 		if (errors.isValid){
-			let searchCriteria = {'searchValue':this.state['PM_PERMISSION_SEARCH_input'],'searchColumn':'PM_PERMISSION_TABLE_NAME'};
 			this.props.actions.saveRolePermission({state:this.props.pmpermission});
 		} else {
-			this.setState({errors:errors.errorMap});
+			this.props.actions.setErrros({errors:errors.errorMap});
 		}
-	}
-	
-	goBack = () => {
-		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::goBack',msg:"test"});
-		this.props.history.goBack();
 	}
 	
 	onOption = (code,item) => {
 		fuLogger.log({level:'TRACE',loc:'PMPermissionContainer::onOption',msg:" code "+code});
+		if (this.onOptionBase(code,item)) {
+			return;
+		}
+		
 		switch(code) {
-			case 'MODIFY': {
-				this.onModify(item);
-				break;
-			}
-			case 'DELETE': {
-				this.openDeleteModal(item);
-				break;
-			}
-			case 'DELETEFINAL': {
-				this.onDelete(item);
-				break;
-			}
 			case 'MODIFY_ROLE_PERMISSION': {
 				this.onRolePermissionModify(item);
 				break;
@@ -230,32 +87,24 @@ class PMPermissionContainer extends Component {
 		if (this.props.pmpermission.isModifyOpen) {
 			return (
 				<PMPermissionModifyView
-				containerState={this.state}
-				item={this.props.pmpermission.selected}
-				inputFields={this.props.pmpermission.inputFields}
+				itemState={this.props.pmpermission}
 				appPrefs={this.props.appPrefs}
-				itemPrefForms={this.props.pmpermission.prefForms}
 				onSave={this.onSave}
 				onCancel={this.onCancel}
-				onReturn={this.onCancel}
-				inputChange={this.inputChange}
-				applicationSelectList={this.props.pmpermission.applicationSelectList}/>
+				inputChange={this.inputChange}/>
 			);
 		} else if (this.props.pmpermission.isRolePermissionOpen) {
 			return (
 				<PMRolePermissionModifyView
-				containerState={this.state}
 				itemState={this.props.pmpermission}
 				appPrefs={this.props.appPrefs}
 				onSave={this.onRolePermissionSave}
 				onCancel={this.onCancel}
-				onReturn={this.onCancel}
 				inputChange={this.inputChange}/>
 			);
 		} else if (this.props.pmpermission.items != null) {
 			return (
 				<PMPermissionView 
-				containerState={this.state}
 				itemState={this.props.pmpermission}
 				appPrefs={this.props.appPrefs}
 				onListLimitChange={this.onListLimitChange}
@@ -280,7 +129,8 @@ class PMPermissionContainer extends Component {
 PMPermissionContainer.propTypes = {
 	appPrefs: PropTypes.object,
 	actions: PropTypes.object,
-	pmpermission: PropTypes.object
+	pmpermission: PropTypes.object,
+	session: PropTypes.object
 };
 
 function mapStateToProps(state, ownProps) {

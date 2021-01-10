@@ -16,7 +16,6 @@
 import reducerUtils from '../../core/common/reducer-utils';
 
 export default function teamReducer(state = {}, action) {
-	let myState = {};
 	switch(action.type) {
     	case 'LOAD_INIT_PM_PERMISSION': {
     		if (action.responseJson != null && action.responseJson.params != null) {
@@ -31,9 +30,16 @@ export default function teamReducer(state = {}, action) {
     				listStart: reducerUtils.getListStart(action),
     				orderCriteria: [{'orderColumn':'PM_PERMISSION_TABLE_NAME','orderDir':'ASC'}],
     				searchCriteria: [{'searchValue':'','searchColumn':'PM_PERMISSION_TABLE_NAME'}],
+    				paginationSegment: 1,
     				selected: null,
     				isModifyOpen: false,
-    				isRolePermissionOpen: false
+    				isRolePermissionOpen: false,
+    				pageName:"PERMISSION",
+					isDeleteModalOpen: false,
+					errors:null, 
+					warns:null, 
+					successes:null,
+					searchValue:""
     			});
     		} else {
     			return state;
@@ -46,9 +52,14 @@ export default function teamReducer(state = {}, action) {
     				items: reducerUtils.getItems(action),
     				listLimit: reducerUtils.getListLimit(action),
     				listStart: reducerUtils.getListStart(action),
+    				paginationSegment: action.paginationSegment,
     				selected: null,
     				isModifyOpen: false,
-    				isRolePermissionOpen: false
+    				isRolePermissionOpen: false,
+    				isDeleteModalOpen: false,
+					errors:null, 
+					warns:null, 
+					successes:null
     			});
     		} else {
     			return state;
@@ -132,6 +143,22 @@ export default function teamReducer(state = {}, action) {
 		}
 		case 'PM_PERMISSION_ORDERBY': { 
 			return reducerUtils.updateOrderBy(state,action);
+		}
+		case 'PM_PERMISSION_SET_ERRORS': {
+			return Object.assign({}, state, {
+				errors: action.errors
+			});
+		}
+		case 'PM_PERMISSION_CLOSE_DELETE_MODAL': {
+			return Object.assign({}, state, {
+				isDeleteModalOpen: false
+			});
+		}
+		case 'PM_PERMISSION_OPEN_DELETE_MODAL': {
+			return Object.assign({}, state, {
+				isDeleteModalOpen: true,
+				selected: action.item
+			});
 		}
     	default:
     		return state;
