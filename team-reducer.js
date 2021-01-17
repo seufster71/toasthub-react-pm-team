@@ -34,7 +34,7 @@ export default function teamReducer(state = {}, action) {
     				selected: null,
     				isModifyOpen: false,
     				isTeamLinkOpen: false,
-    				pageName:"TEAM",
+    				pageName:"PM_TEAM",
 					isDeleteModalOpen: false,
 					errors:null, 
 					warns:null, 
